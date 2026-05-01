@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d0f;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    .calculator {
+      width: 320px;
+      background: #16161a;
+      border: 1px solid #2a2a35;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    }
+
+    .calc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid #2a2a35;
+    }
+
+    .dots { display: flex; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    .calc-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #555568;
+    }
+
+    .display {
+      padding: 16px 20px 14px;
+      min-height: 108px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      background: #1e1e24;
+      border-bottom: 1px solid #2a2a35;
+    }
+
+    .expression {
+      font-size: 12px;
+      color: #555568;
+      min-height: 18px;
+      text-align: right;
+      letter-spacing: 1px;
+      word-break: break-all;
+    }
+
+    #result {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      color: #e8e8f0;
+      line-height: 1;
+      margin-top: 4px;
+      letter-spacing: 2px;
+      word-break: break-all;
+      text-align: right;
+      transition: color 0.15s;
+    }
+
+    #result.flash { color: #00e5ff; }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 10px;
+    }
+
+    button {
+      height: 68px;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s, opacity 0.1s;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:hover  { opacity: 0.85; }
+    button:active { transform: scale(0.92); opacity: 0.7; }
+
+    .btn-num   { background: #1c1c26; color: #e8e8f0; }
+    .btn-op    { background: #1a1a2e; color: #00e5ff; }
+    .btn-clear { background: #1e1e2a; color: #ff3cac; }
+    .btn-del   { background: #1e1e2a; color: #ffaa00; font-size: 16px; }
+    .btn-pct   { background: #1e1e2a; color: #ff3cac; }
+    .btn-eq    { background: #00e5ff; color: #000; font-weight: bold; font-size: 22px; box-shadow: 0 4px 20px rgba(0,229,255,0.3); }
+    .btn-zero  { grid-column: span 2; justify-content: flex-start; padding-left: 24px; }
+
+    .calc-footer {
+      padding: 8px;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #555568;
+      border-top: 1px solid #2a2a35;
+    }
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <div class="calc-header">
+    <div class="dots">
+      <div class="dot" style="background:#ff5f57"></div>
+      <div class="dot" style="background:#febc2e"></div>
+      <div class="dot" style="background:#28c840"></div>
+    </div>
+    <span class="calc-title">CALC · MK1</span>
+  </div>
+
+  <div class="display">
+    <div class="expression" id="expression"></div>
+    <div id="result">0</div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn-clear" id="btn-AC">AC</button>
+    <button class="btn-del"   id="btn-DEL">⌫</button>
+    <button class="btn-pct"   id="btn-PCT">%</button>
+    <button class="btn-op"    id="btn-DIV">÷</button>
+
+    <button class="btn-num" id="btn-7">7</button>
+    <button class="btn-num" id="btn-8">8</button>
+    <button class="btn-num" id="btn-9">9</button>
+    <button class="btn-op"  id="btn-MUL">×</button>
+
+    <button class="btn-num" id="btn-4">4</button>
+    <button class="btn-num" id="btn-5">5</button>
+    <button class="btn-num" id="btn-6">6</button>
+    <button class="btn-op"  id="btn-SUB">−</button>
+
+    <button class="btn-num" id="btn-1">1</button>
+    <button class="btn-num" id="btn-2">2</button>
+    <button class="btn-num" id="btn-3">3</button>
+    <button class="btn-op"  id="btn-ADD">+</button>
+
+    <button class="btn-num btn-zero" id="btn-0">0</button>
+    <button class="btn-num"          id="btn-DOT">.</button>
+    <button class="btn-eq"           id="btn-EQ">=</button>
+  </div>
+
+  <div class="calc-footer">DIVYA · AI STUDIO</div>
+</div>
+
+<script>
+  var current      = '0';
+  var firstOperand = null;
+  var operator     = null;
+  var waitNext     = false;
+  var justCalc     = false;
+
+  var resultEl = document.getElementById('result');
+  var exprEl   = document.getElementById('expression');
+
+  function updateDisplay(expr) {
+    var disp = current.length > 12 ? parseFloat(current).toExponential(4) : current;
+    resultEl.textContent = disp;
+    if (expr !== undefined) exprEl.textContent = expr;
+  }
+
+  function doMath(a, op, b) {
+    a = parseFloat(a);
+    b = parseFloat(b);
+    if (op === '+') return a + b;
+    if (op === '-') return a - b;
+    if (op === '*') return a * b;
+    if (op === '/') return b === 0 ? null : a / b;
+    return b;
+  }
+
+  function round10(n) { return Math.round(n * 1e10) / 1e10; }
+
+  function pressNum(n) {
+    if (justCalc)  { firstOperand = null; operator = null; justCalc = false; current = n; updateDisplay(''); return; }
+    if (waitNext)  { waitNext = false; current = n; updateDisplay(); return; }
+    current = (current === '0') ? n : (current.length < 12 ? current + n : current);
+    updateDisplay();
+  }
+
+  function pressDot() {
+    if (waitNext || justCalc) { waitNext = false; justCalc = false; current = '0.'; updateDisplay(); return; }
+    if (!current.includes('.')) { current += '.'; updateDisplay(); }
+  }
+
+  function pressOp(op) {
+    justCalc = false;
+    if (firstOperand !== null && !waitNext) {
+      var res = doMath(firstOperand, operator, current);
+      if (res === null) { current = 'Err'; firstOperand = null; operator = null; updateDisplay(''); return; }
+      res = round10(res);
+      current = String(res);
+    }
+    firstOperand = parseFloat(current);
+    operator = op;
+    var lbl = op === '+' ? '+' : op === '-' ? '−' : op === '*' ? '×' : '÷';
+    updateDisplay(current + ' ' + lbl);
+    waitNext = true;
+  }
+
+  function pressEq() {
+    if (firstOperand === null || operator === null) return;
+    var res = doMath(firstOperand, operator, current);
+    if (res === null) { current = 'Err'; firstOperand = null; operator = null; updateDisplay(''); return; }
+    res = round10(res);
+    var lbl = operator === '+' ? '+' : operator === '-' ? '−' : operator === '*' ? '×' : '÷';
+    updateDisplay(firstOperand + ' ' + lbl + ' ' + current + ' =');
+    current      = String(res);
+    firstOperand = null;
+    operator     = null;
+    justCalc     = true;
+    waitNext     = false;
+    resultEl.textContent = current;
+    resultEl.classList.add('flash');
+    setTimeout(function(){ resultEl.classList.remove('flash'); }, 300);
+  }
+
+  function pressAC() {
+    current = '0'; firstOperand = null; operator = null; waitNext = false; justCalc = false;
+    updateDisplay('');
+  }
+
+  function pressDel() {
+    if (justCalc || waitNext) { pressAC(); return; }
+    current = current.length > 1 ? current.slice(0, -1) : '0';
+    updateDisplay();
+  }
+
+  function pressPct() {
+    current = String(round10(parseFloat(current) / 100));
+    updateDisplay();
+  }
+
+  // Wire buttons
+  document.getElementById('btn-AC').addEventListener('click',  pressAC);
+  document.getElementById('btn-DEL').addEventListener('click', pressDel);
+  document.getElementById('btn-PCT').addEventListener('click', pressPct);
+  document.getElementById('btn-EQ').addEventListener('click',  pressEq);
+  document.getElementById('btn-DOT').addEventListener('click', pressDot);
+  document.getElementById('btn-ADD').addEventListener('click', function(){ pressOp('+'); });
+  document.getElementById('btn-SUB').addEventListener('click', function(){ pressOp('-'); });
+  document.getElementById('btn-MUL').addEventListener('click', function(){ pressOp('*'); });
+  document.getElementById('btn-DIV').addEventListener('click', function(){ pressOp('/'); });
+
+  ['0','1','2','3','4','5','6','7','8','9'].forEach(function(n){
+    document.getElementById('btn-' + n).addEventListener('click', function(){ pressNum(n); });
+  });
+
+  // Keyboard support
+  document.addEventListener('keydown', function(e){
+    if ('0123456789'.includes(e.key)) pressNum(e.key);
+    else if (e.key === '.')           pressDot();
+    else if (e.key === '+')           pressOp('+');
+    else if (e.key === '-')           pressOp('-');
+    else if (e.key === '*')           pressOp('*');
+    else if (e.key === '/') { e.preventDefault(); pressOp('/'); }
+    else if (e.key === 'Enter' || e.key === '=') pressEq();
+    else if (e.key === 'Backspace')   pressDel();
+    else if (e.key === 'Escape')      pressAC();
+    else if (e.key === '%')           pressPct();
+  });
+</script>
+</body>
+</html>
